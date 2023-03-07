@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid';
 import { useState, useEffect } from 'react';
-import { SearchForm, Grid, GridItem, Todo } from 'components';
-// Grid, GridItem, SearchForm, EditForm,Todo
+import { SearchForm, Grid, GridItem, Todo, EditForm } from 'components';
+
 export const Todos = () => {
   const [todos, setTodos] = useState(
     () => JSON.parse(localStorage.getItem('todos')) ?? []
   );
-  // const [isEditing, setIsEditing] = useState(false);
-  // const [currentTodo, setCurrentTodo] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentTodo, setCurrentTodo] = useState([]);
 
   useEffect(() => {
     window.localStorage.setItem('todos', JSON.stringify(todos));
@@ -27,13 +27,67 @@ export const Todos = () => {
     setTodos(filterTodo);
   };
 
+  const handlClickEdit = todoId => {
+    setIsEditing(true);
+    const chooseTodo = todos.filter(({ id }) => id === todoId);
+    setCurrentTodo(chooseTodo);
+  };
+
+  const handlUpdateTodo = (e, currentTodo) => {
+    e.preventDefault();
+
+    const [{ id, text }] = currentTodo;
+
+    setTodos(prevTodos =>
+      prevTodos.map(todo => {
+        if (todo.id === id) {
+          return { id, text };
+        }
+        return todo;
+      })
+    );
+    e.target.elements.edit.value = '';
+    setIsEditing(false);
+  };
+
+  const handlCancel = () => {
+    setIsEditing(false);
+  };
+
+  const handlChangeTodo = text => {
+    setCurrentTodo(prevTodo =>
+      prevTodo.map(({ id, text: oldText }) => {
+        if (oldText !== text) {
+          return { id, text };
+        }
+        return { id, oldText };
+      })
+    );
+  };
+
   return (
     <>
-      <SearchForm onSubmit={handlSubmit} />
+      {isEditing ? (
+        <EditForm
+          onCancel={handlCancel}
+          onUpdate={handlUpdateTodo}
+          onChange={handlChangeTodo}
+          currentTodo={currentTodo}
+        />
+      ) : (
+        <SearchForm onSubmit={handlSubmit} />
+      )}
+
       <Grid>
         {todos.map(({ id, text }, i) => (
           <GridItem key={id}>
-            <Todo text={text} num={i + 1} id={id} deleteTodoByid={deleteTodo} />
+            <Todo
+              text={text}
+              num={i + 1}
+              id={id}
+              deleteTodoByid={deleteTodo}
+              onClickEdit={handlClickEdit}
+            />
           </GridItem>
         ))}
       </Grid>

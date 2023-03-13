@@ -13,10 +13,19 @@ export const Todos = () => {
     window.localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
 
+  const handlClickIsCheked = id => {
+    setTodos(prevState =>
+      prevState.map(todo =>
+        todo.id === id ? { ...todo, isCheked: !todo.isCheked } : todo
+      )
+    );
+  };
+
   const handlSubmit = text => {
     const todo = {
       id: nanoid(),
       text,
+      isCheked: false,
     };
 
     setTodos(prevTodos => [...prevTodos, todo]);
@@ -36,12 +45,12 @@ export const Todos = () => {
   const handlUpdateTodo = (e, currentTodo) => {
     e.preventDefault();
 
-    const [{ id, text }] = currentTodo;
+    const [{ id, text, isCheked }] = currentTodo;
 
     setTodos(prevTodos =>
       prevTodos.map(todo => {
         if (todo.id === id) {
-          return { id, text };
+          return { id, text, isCheked };
         }
         return todo;
       })
@@ -56,11 +65,11 @@ export const Todos = () => {
 
   const handlChangeTodo = text => {
     setCurrentTodo(prevTodo =>
-      prevTodo.map(({ id, text: oldText }) => {
+      prevTodo.map(({ id, text: oldText, isCheked }) => {
         if (oldText !== text) {
-          return { id, text };
+          return { id, text, isCheked };
         }
-        return { id, oldText };
+        return { id, oldText, isCheked };
       })
     );
   };
@@ -79,14 +88,16 @@ export const Todos = () => {
       )}
 
       <Grid>
-        {todos.map(({ id, text }, i) => (
+        {todos.map(({ id, text, isCheked }, i) => (
           <GridItem key={id}>
             <Todo
+              isCheked={isCheked}
               text={text}
               num={i + 1}
               id={id}
               deleteTodoByid={deleteTodo}
               onClickEdit={handlClickEdit}
+              onClickCheked={handlClickIsCheked}
             />
           </GridItem>
         ))}

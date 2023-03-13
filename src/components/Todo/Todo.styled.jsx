@@ -1,4 +1,4 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 
 export const TodoWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing(10)};
@@ -39,5 +39,20 @@ export const EditButton = styled.button`
   &:hover,
   &:focus {
     transform: scale(1.05);
+  }
+`;
+
+export const Label = styled.label`
+position: absolute;
+    bottom: 8%;
+    
+    left: 10%;
+   
+}
+`;
+
+export const InputCheckBox = styled.input`
+  &:checked {
+    text-decoration: line-through;
   }
 `;
